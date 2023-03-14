@@ -194,7 +194,7 @@ class BigramLanguageModel(nn.Module):
             #focus only on the last time step
             logits = logits[:,-1,:] #becomes (B,C)
             #apply softmax to get probablilites 
-            probs = F.softmax(logits, dim=1) #(B,C)
+            probs = F.softmax(logits, dim=- 1) #(B,C)
             #sample from the distribution
             idx_next = torch.multinomial(probs, num_samples=1) #(B,1)
             #append sampled index to the running sequence
@@ -204,14 +204,16 @@ class BigramLanguageModel(nn.Module):
 model = BigramLanguageModel()
 m = model.to(device)
 
+#Print the number of parameters in the model
+print(sum(p.numel() for p in m.parameters())/1e6,'M Parameters')
 
 #Create PyTorch Optimizer
 
-optimizer = torch.optim.AdamW(m.parameters(),lr=1e-3)
+optimizer = torch.optim.AdamW(model.parameters(),lr=learning_rate)
 
 for iter in range(max_iters):
     #every once in a while evalate the loss on train and val sets
-    if iter % eval_interval == 0:
+    if iter % eval_interval == 0 or iter == max_iters-1:
         losses = estimate_loss()
         print(f"step {iter}: train loss{losses['train']:.4f}, val loss {losses['val']:.4f}")
 
