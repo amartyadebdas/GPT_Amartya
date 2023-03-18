@@ -194,7 +194,7 @@ class BigramLanguageModel(nn.Module):
             #focus only on the last time step
             logits = logits[:,-1,:] #becomes (B,C)
             #apply softmax to get probablilites 
-            probs = F.softmax(logits, dim=- 1) #(B,C)
+            probs = F.softmax(logits, dim=-1) #(B,C)
             #sample from the distribution
             idx_next = torch.multinomial(probs, num_samples=1) #(B,1)
             #append sampled index to the running sequence
